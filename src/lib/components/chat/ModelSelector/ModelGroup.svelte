@@ -27,16 +27,17 @@
 
 	// Show expanded if either forced or manually expanded
 	$: isExpanded = forceExpanded || manuallyExpanded;
+	
+	// Check if this group contains the currently selected model
+	$: containsSelectedModel = items.some((item) => item.value === value);
 </script>
 
-<div
-	class="relative"
-	role="group"
-	aria-label={groupName}
->
+<div class="relative" role="group" aria-label={groupName}>
 	<button
 		bind:this={groupButton}
-		class="flex group/item w-full text-left font-medium select-none items-center rounded-button py-2 pl-3 pr-1.5 text-sm text-gray-700 dark:text-gray-100 outline-hidden transition-all duration-75 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl cursor-pointer"
+		class="flex group/item w-full text-left font-medium select-none items-center rounded-button py-2 pl-3 pr-1.5 text-sm outline-hidden transition-all duration-75 rounded-xl cursor-pointer {containsSelectedModel
+			? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-50'
+			: 'text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'}"
 		on:click={() => {
 			if (!forceExpanded) {
 				manuallyExpanded = !manuallyExpanded;
@@ -52,21 +53,23 @@
 			<div class="flex items-center gap-2">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 16 16"
+					viewBox="0 0 32 32"
 					fill="currentColor"
 					class="size-4"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M2 4.75A.75.75 0 0 1 2.75 4h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 8a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 8Zm0 3.25a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z"
-						clip-rule="evenodd"
-					/>
+					>
+					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+						><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path
+							fill="currentColor"
+							d="M12 14L1 8l11-6l11 6zm0 4L1.575 12.325l2.1-1.15L12 15.725l8.325-4.55l2.1 1.15zm0 4L1.575 16.325l2.1-1.15L12 19.725l8.325-4.55l2.1 1.15zm0-10.275L18.825 8L12 4.275L5.175 8zM12 8"
+						/></svg
+					>
 				</svg>
 				<span class="font-semibold">{groupName}</span>
 			</div>
 		</div>
 		<div class="text-xs text-gray-500 dark:text-gray-400">
-			{items.length} {items.length === 1 ? $i18n.t('Model') : $i18n.t('Models')}
+			{items.length}
+			{items.length === 1 ? $i18n.t('Model') : $i18n.t('Models')}
 		</div>
 	</button>
 
@@ -89,4 +92,3 @@
 		</div>
 	{/if}
 </div>
-
