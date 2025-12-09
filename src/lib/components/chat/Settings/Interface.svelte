@@ -103,6 +103,7 @@
 	let showManageImageCompressionModal = false;
 
 	let textScale = null;
+	let groupModelsByPath = false;
 
 	const toggleLandingPageMode = async () => {
 		landingPageMode = landingPageMode === '' ? 'chat' : '';
@@ -273,6 +274,7 @@
 		webSearch = $settings?.webSearch ?? null;
 
 		textScale = $settings?.textScale ?? null;
+		groupModelsByPath = $settings?.groupModelsByPath ?? false;
 	});
 </script>
 
@@ -585,6 +587,48 @@
 					</div>
 				</div>
 			{/if}
+
+			<div class=" my-2 text-sm font-medium">{$i18n.t('Model Selector')}</div>
+
+			<div>
+				<div class=" py-0.5 flex w-full justify-between">
+					<div id="group-models-by-path-label" class=" self-center text-xs flex items-center gap-1.5">
+						<span>{$i18n.t('Group Models by Path')}</span>
+						<Tooltip
+							content={$i18n.t(
+								'Automatically organize models by their path prefix (e.g., "openai/", "aws/anthropic/") into collapsible groups in the model selector'
+							)}
+							placement="top"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="size-3.5 text-gray-500 dark:text-gray-400"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+								/>
+							</svg>
+						</Tooltip>
+					</div>
+
+					<div class="flex items-center gap-2 p-1">
+						<Switch
+							ariaLabelledbyId="group-models-by-path-label"
+							tooltip={true}
+							bind:state={groupModelsByPath}
+							on:change={() => {
+								saveSettings({ groupModelsByPath });
+							}}
+						/>
+					</div>
+				</div>
+			</div>
 
 			<div class=" my-2 text-sm font-medium">{$i18n.t('Chat')}</div>
 

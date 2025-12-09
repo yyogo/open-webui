@@ -206,6 +206,7 @@ type Settings = {
 	chatDirection?: 'LTR' | 'RTL' | 'auto';
 	ctrlEnterToSend?: boolean;
 	renderMarkdownInPreviews?: boolean;
+	groupModelsByPath?: boolean;
 
 	system?: string;
 	seed?: number;

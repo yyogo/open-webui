@@ -35,6 +35,7 @@
 	import ChatBubbleOval from '$lib/components/icons/ChatBubbleOval.svelte';
 
 	import ModelItem from './ModelItem.svelte';
+	import ModelGroup from './ModelGroup.svelte';
 
 	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
@@ -158,6 +159,36 @@
 						}
 					})
 	).filter((item) => !(item.model?.info?.meta?.hidden ?? false));
+
+	// Group models by path prefix if enabled
+	const getPathPrefix = (modelId: string): string => {
+		const lastSlashIndex = modelId.lastIndexOf('/');
+		if (lastSlashIndex > 0) {
+			return modelId.substring(0, lastSlashIndex);
+		}
+		return 'Other';
+	};
+
+	$: groupedItems = (() => {
+		if (!($settings?.groupModelsByPath ?? false)) {
+			return null;
+		}
+
+		const groups: Record<string, typeof filteredItems> = {};
+
+		for (const item of filteredItems) {
+			const prefix = getPathPrefix(item.value);
+			if (!groups[prefix]) {
+				groups[prefix] = [];
+			}
+			groups[prefix].push(item);
+		}
+
+		// Sort groups by name and convert to array
+		return Object.entries(groups)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([groupName, items]) => ({ groupName, items }));
+	})();
 
 	$: if (selectedTag || selectedConnectionType) {
 		resetView();
@@ -567,42 +598,63 @@
 				{/if}
 			</div>
 
-			<div class="px-2.5 group relative">
-				{#if filteredItems.length === 0}
-					<div class="">
-						<div class="block px-3 py-2 text-sm text-gray-700 dark:text-gray-100">
-							{$i18n.t('No results found')}
-						</div>
-					</div>
-				{:else}
-					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<div
-						class="max-h-64 overflow-y-auto"
-						bind:this={listContainer}
-						on:scroll={() => {
-							listScrollTop = listContainer.scrollTop;
-						}}
-					>
-						<div style="height: {visibleStart * ITEM_HEIGHT}px;" />
-						{#each filteredItems.slice(visibleStart, visibleEnd) as item, i (item.value)}
-							{@const index = visibleStart + i}
-							<ModelItem
-								{selectedModelIdx}
-								{item}
-								{index}
-								{value}
-								{pinModelHandler}
-								{unloadModelHandler}
-								onClick={() => {
-									value = item.value;
-									selectedModelIdx = index;
 
-									show = false;
-								}}
-							/>
-						{/each}
-						<div style="height: {(filteredItems.length - visibleEnd) * ITEM_HEIGHT}px;" />
-					</div>
+			<div class="px-2.5 group relative">
+				{#if groupedItems && groupedItems.length > 0}
+					<!-- Grouped view -->
+					{#each groupedItems as group}
+						<ModelGroup
+							groupName={group.groupName}
+							items={group.items}
+							allFilteredItems={filteredItems}
+							{value}
+							{selectedModelIdx}
+							{pinModelHandler}
+							{unloadModelHandler}
+							forceExpanded={searchValue.trim() !== ''}
+							onModelSelect={(item, index) => {
+								value = item.value;
+								selectedModelIdx = filteredItems.findIndex((i) => i.value === item.value);
+								show = false;
+							}}
+						/>
+					{/each}
+				{:else}
+					{#if filteredItems.length === 0}
+						<div class="">
+							<div class="block px-3 py-2 text-sm text-gray-700 dark:text-gray-100">
+								{$i18n.t('No results found')}
+							</div>
+						</div>
+					{:else}
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<div
+							class="max-h-64 overflow-y-auto"
+							bind:this={listContainer}
+							on:scroll={() => {
+								listScrollTop = listContainer.scrollTop;
+							}}
+						>
+							<div style="height: {visibleStart * ITEM_HEIGHT}px;" />
+							{#each filteredItems.slice(visibleStart, visibleEnd) as item, i (item.value)}
+								{@const index = visibleStart + i}
+								<ModelItem
+									{selectedModelIdx}
+									{item}
+									{index}
+									{value}
+									{pinModelHandler}
+									{unloadModelHandler}
+									onClick={() => {
+										value = item.value;
+										selectedModelIdx = index;
+										show = false;
+									}}
+								/>
+							{/each}
+							<div style="height: {(filteredItems.length - visibleEnd) * ITEM_HEIGHT}px;" />
+						</div>
+					{/if}
 				{/if}
 
 				{#if !(searchValue.trim() in $MODEL_DOWNLOAD_POOL) && searchValue && ollamaVersion && $user?.role === 'admin'}
