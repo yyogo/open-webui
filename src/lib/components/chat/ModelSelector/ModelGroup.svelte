@@ -27,7 +27,7 @@
 
 	// Show expanded if either forced or manually expanded
 	$: isExpanded = forceExpanded || manuallyExpanded;
-	
+
 	// Check if this group contains the currently selected model
 	$: containsSelectedModel = items.some((item) => item.value === value);
 </script>
@@ -56,7 +56,7 @@
 					viewBox="0 0 32 32"
 					fill="currentColor"
 					class="size-4"
-					>
+				>
 					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
 						><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path
 							fill="currentColor"

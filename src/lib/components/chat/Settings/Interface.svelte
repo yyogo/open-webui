@@ -592,7 +592,10 @@
 
 			<div>
 				<div class=" py-0.5 flex w-full justify-between">
-					<div id="group-models-by-path-label" class=" self-center text-xs flex items-center gap-1.5">
+					<div
+						id="group-models-by-path-label"
+						class=" self-center text-xs flex items-center gap-1.5"
+					>
 						<span>{$i18n.t('Group Models by Path')}</span>
 						<Tooltip
 							content={$i18n.t(

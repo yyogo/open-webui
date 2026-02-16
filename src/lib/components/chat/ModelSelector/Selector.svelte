@@ -598,7 +598,6 @@
 				{/if}
 			</div>
 
-
 			<div class="px-2.5 group relative">
 				{#if groupedItems && groupedItems.length > 0}
 					<!-- Grouped view -->
@@ -619,42 +618,40 @@
 							}}
 						/>
 					{/each}
+				{:else if filteredItems.length === 0}
+					<div class="">
+						<div class="block px-3 py-2 text-sm text-gray-700 dark:text-gray-100">
+							{$i18n.t('No results found')}
+						</div>
+					</div>
 				{:else}
-					{#if filteredItems.length === 0}
-						<div class="">
-							<div class="block px-3 py-2 text-sm text-gray-700 dark:text-gray-100">
-								{$i18n.t('No results found')}
-							</div>
-						</div>
-					{:else}
-						<!-- svelte-ignore a11y-no-static-element-interactions -->
-						<div
-							class="max-h-64 overflow-y-auto"
-							bind:this={listContainer}
-							on:scroll={() => {
-								listScrollTop = listContainer.scrollTop;
-							}}
-						>
-							<div style="height: {visibleStart * ITEM_HEIGHT}px;" />
-							{#each filteredItems.slice(visibleStart, visibleEnd) as item, i (item.value)}
-								{@const index = visibleStart + i}
-								<ModelItem
-									{selectedModelIdx}
-									{item}
-									{index}
-									{value}
-									{pinModelHandler}
-									{unloadModelHandler}
-									onClick={() => {
-										value = item.value;
-										selectedModelIdx = index;
-										show = false;
-									}}
-								/>
-							{/each}
-							<div style="height: {(filteredItems.length - visibleEnd) * ITEM_HEIGHT}px;" />
-						</div>
-					{/if}
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<div
+						class="max-h-64 overflow-y-auto"
+						bind:this={listContainer}
+						on:scroll={() => {
+							listScrollTop = listContainer.scrollTop;
+						}}
+					>
+						<div style="height: {visibleStart * ITEM_HEIGHT}px;" />
+						{#each filteredItems.slice(visibleStart, visibleEnd) as item, i (item.value)}
+							{@const index = visibleStart + i}
+							<ModelItem
+								{selectedModelIdx}
+								{item}
+								{index}
+								{value}
+								{pinModelHandler}
+								{unloadModelHandler}
+								onClick={() => {
+									value = item.value;
+									selectedModelIdx = index;
+									show = false;
+								}}
+							/>
+						{/each}
+						<div style="height: {(filteredItems.length - visibleEnd) * ITEM_HEIGHT}px;" />
+					</div>
 				{/if}
 
 				{#if !(searchValue.trim() in $MODEL_DOWNLOAD_POOL) && searchValue && ollamaVersion && $user?.role === 'admin'}
